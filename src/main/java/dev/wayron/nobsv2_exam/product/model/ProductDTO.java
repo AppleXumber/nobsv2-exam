@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public class ProductDTO {
     private UUID id;
+    private String name;
     private String description;
     private double price;
     private String manufacturer;
@@ -12,6 +13,7 @@ public class ProductDTO {
 
     public ProductDTO(Product product) {
         this.id = product.getId();
+        this.name = product.getName();
         this.description = product.getDescription();
         this.price = product.getPrice();
         this.manufacturer = product.getManufacturer();
@@ -25,6 +27,14 @@ public class ProductDTO {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
