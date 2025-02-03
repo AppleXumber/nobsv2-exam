@@ -5,8 +5,11 @@ import dev.wayron.nobsv2_exam.product.model.ProductDTO;
 import dev.wayron.nobsv2_exam.product.model.UpdateProductCommand;
 import dev.wayron.nobsv2_exam.product.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -26,6 +29,16 @@ public class ProductController {
     @GetMapping("/product/{id}")
     public ResponseEntity<ProductDTO> getProductById(@PathVariable String id) {
         return service.searchProductById(id);
+    }
+
+    @GetMapping("/product/search")
+    @Cacheable(value = "products", key = "#search + #searchBy + #orderBy")
+    public ResponseEntity<List<ProductDTO>> searchProducts(
+            @RequestParam String name,
+            @RequestParam(required = false, defaultValue = "name") String searchBy,
+            @RequestParam(required = false) String orderBy)
+    {
+        return service.searchProducts(name, searchBy, orderBy);
     }
 
     @PutMapping("/product/{id}")

@@ -8,8 +8,9 @@ import dev.wayron.nobsv2_exam.product.repository.ProductRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,6 +33,29 @@ public class ProductService {
         if (productOptional.isPresent()) return ResponseEntity.ok(new ProductDTO(productOptional.get()));
 
         throw new ProductNotFoundException();
+    }
+
+    public ResponseEntity<List<ProductDTO>> searchProducts(String search, String searchBy, String orderBy) {
+        List<Product> products;
+
+        if ("category".equalsIgnoreCase(searchBy)) {
+            products = repository.findByCategoryContaining(search);
+        } else {
+            products = repository.findByNameOrDescriptionContaining(search);
+        }
+
+        if("price".equalsIgnoreCase(orderBy)) {
+            products.sort(Comparator.comparing(Product::getPrice));
+        } else if ("abc".equalsIgnoreCase(orderBy)){
+            products.sort(Comparator.comparing(Product::getName));
+        }
+
+        List<ProductDTO> productDTOS = products.stream()
+                .map(ProductDTO::new)
+                .limit(10)
+                .toList();
+
+        return ResponseEntity.ok(productDTOS);
     }
 
     public ResponseEntity<ProductDTO> updateProduct(UpdateProductCommand command) {
